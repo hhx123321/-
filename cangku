@@ -1,0 +1,761 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include<ctype.h>
+#include<stdbool.h>
+
+typedef struct 
+{
+    char username[20];
+    char password[20];
+    
+} user;
+
+typedef struct goodsmessage
+{
+	int num;
+	char name[30];
+	int price;
+	int count;
+	char type[30];
+	struct goodsmessage* next;
+}goods;
+
+int isStr(char *num)// (判断输入的是不是字母)
+{
+    int i, len;
+    len = strlen(num);
+    for (i = 0; i < len; i++) {
+        if (!isdigit(num[i])) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+
+
+void saveacc(user* account) {
+    FILE *file = fopen("D:\\桌面\\account.txt", "w");
+    if (file != NULL) {
+        fprintf(file, "%s %s\n", account->username, account->password);
+        fclose(file);
+        
+    } else {
+        printf("无法打开文件进行写操作\n");
+    }
+}
+
+
+
+
+
+
+
+
+int loadacc(user *account) {
+    FILE *file = fopen("D:\\桌面\\account.txt", "r");
+    if (file != NULL) {
+        if (fscanf(file, "%s %s", account->username, account->password) == 2 ) {
+            fclose(file);
+            return 1; // 读取成功
+        } else {
+            fclose(file);
+            return 0; // 读取失败
+        }
+    } else {
+        printf("无法打开文件进行读操作\n");
+        return 0; // 读取失败
+    }
+}
+
+// 创建账号
+void createacc(user *account) {
+    printf("请输入用户名：");
+    scanf("%s", account->username);
+    printf("请输入密码：");
+    scanf("%s", account->password);
+    printf("账号创建成功\n");
+  
+}
+
+// 登录
+int login(user *account) 
+{
+    char Uname[20];
+    char Upass[20];
+    
+    printf("请输入用户名：");
+    scanf("%s", Uname);
+    printf("请输入密码：");
+    scanf("%s", Upass);
+    
+    if (strcmp(account -> username, Uname) == 0 && strcmp(account->password, Upass) == 0) 
+	{
+	
+        return 1; 
+    } else 
+	{
+        return 0; 
+    }
+}
+
+void changepass(user *account) // 修改密码
+{
+    char newpass[20];
+    printf("请输入新密码：");
+    scanf("%s", newpass);
+    strcpy(account->password, newpass);
+    printf("密码修改成功\n");
+
+}
+
+
+void findpass(user *account) // 找回密码
+{
+    printf("您的密码是：%s\n", account -> password);
+}
+
+
+
+void ergodic(goods* head )//2.遍历货物信息 (已完善) 
+{
+	goods *p = head -> next;
+	int i = 1;
+	printf("序号	编号    货名	价格	数量	类型\n");
+	while(p != NULL)
+	{
+		printf("%d.	%d	%s	%d	%d	%s\n" ,i , p -> num , p -> name ,p -> price , p -> count , p -> type);	
+		p = p -> next;
+		i++;
+	}
+}
+
+bool creat(goods* head)
+{
+				int n;
+				goods *p = head ;
+				int i;
+				while(1){
+				printf("\n");
+				printf("请输入录入货物个数：");			
+				if (scanf("%d", &n) != 1)
+       			{	
+					printf("\n");
+            		printf("[ERROW]您的输入有误，请重新输入。\n");     
+            		while (getchar() != '\n');
+        		}else{break;}	
+        		}
+				
+					for( i = 0 ; i < n ; i++)
+					{
+						p -> next = (goods*)malloc(sizeof(goods));
+						while(1){
+						printf("\n");
+						printf("请输入货物编号："); 
+						if (scanf("%d", &p -> next -> num) != 1)
+       					{
+       						printf("\n");
+            				printf("[ERROW]您的输入有误，请重新输入。\n\n");     
+            				while (getchar() != '\n');
+        				}else{break;}	
+						}
+					while(1){
+						printf("请输入货物名称：");
+						scanf("%s" ,p -> next ->name);
+						if (isStr(p -> next -> name) == 0) 
+						{
+						printf("\n");
+						printf("[ERROW]您的输入有误，请重新输入。\n");	
+						}else{break;}			
+							}	
+					while(1){
+						printf("请输入货物价格："); 
+						if (scanf("%d", &p -> next -> price) != 1)
+       					{
+       					printf("\n");
+            			printf("[ERROW]您的输入有误，请重新输入。\n\n");     
+            			while (getchar() != '\n');
+        				}else{break;}	
+						}
+					while(1){
+							printf("请输入货物数量："); 
+							if (scanf("%d", &p -> next -> count) != 1)
+       						{
+       						printf("\n");
+            				printf("[ERROW]您的输入有误，请重新输入。\n\n");     
+            				while (getchar() != '\n');
+        					}else{break;}	
+							}
+					while(1){
+							printf("请输入货物类型：");
+							scanf("%s" ,p -> next -> type);
+							if (isStr(p -> next -> type) == 0) 
+							{
+							printf("\n");
+							printf("[ERROW]您的输入有误，请重新输入。\n");	
+							}else{break;}			
+							}
+					printf("保存成功！\n");
+					printf("\n");
+		   			p = p -> next;
+			}
+			p -> next = NULL;	
+			printf("创建成功，请继续\n");
+			printf("\n");
+			ergodic(head);
+			printf("\n");
+			return true;
+							
+}
+
+
+
+bool gAddhead(goods* head,int n)//3.插入货物信息 (已完善)
+{
+	int k ,i;
+
+	goods *p = head;
+	goods* newgoods = (goods*)malloc(sizeof(goods));//给新加的信息开空间 
+
+	while(1)
+		{
+			printf("\n");
+			printf("请输入在序号为几的货物后插入信息："); 
+			if (scanf("%d", &k) != 1 || k > n+1)
+       		{
+       			printf("\n");
+            	printf("[ERROW]您的输入有误，请重新输入。\n");    
+            	while (getchar() != '\n');
+        	}else{break;
+			}	
+		}
+
+	for(  i = 0 ; i < k  ; i++)
+	{
+		p = p -> next;
+		
+	}	
+		newgoods -> next = p -> next;
+		p -> next =  newgoods;
+			while (1) {
+        printf("\n");
+        printf("请输入编号：");
+        if (scanf("%d", &newgoods->num) != 1) {
+            printf("\n");
+            printf("[ERROR]您的输入有误，请重新输入。\n");
+            while (getchar() != '\n');
+                
+        } else {
+            // 遍历链表检查学号是否重复
+            goods* q = head->next;
+            while (q != NULL) {
+                if (q->num == newgoods->num && q != newgoods) {
+                    printf("[ERROR] 编号重复，请重新输入。\n");
+                    break;
+                }
+                q = q->next;
+            }
+            if (q == NULL) {
+                break;  // 学号没有重复，跳出循环
+            }
+        }
+    }
+			
+		while(1){
+				printf("请输入货物名称：");
+				scanf("%s" ,p -> next ->name);
+				if (isStr(p -> next -> name) == 0) 
+				{
+					printf("\n");
+					printf("[ERROW]您的输入有误，请重新输入。\n");	
+				}else{break;}			
+			}	
+		while(1){
+			printf("请输入货物价格："); 
+			if (scanf("%d", &p -> next -> price) != 1)
+       		{
+       			printf("\n");
+            	printf("[ERROW]您的输入有误，请重新输入。\n\n");     
+            	while (getchar() != '\n');
+        	}else{break;}	
+			}
+		while(1){
+			printf("请输入货物数量："); 
+			if (scanf("%d", &p -> next -> count) != 1)
+       		{
+       			printf("\n");
+            	printf("[ERROW]您的输入有误，请重新输入。\n\n");     
+            	while (getchar() != '\n');
+        	}else{break;}	
+			}
+			while(1){
+				printf("请输入货物类型：");
+				scanf("%s" ,p -> next -> type);
+				if (isStr(p -> next -> type) == 0) 
+				{
+					printf("\n");
+					printf("[ERROW]您的输入有误，请重新输入。\n");	
+				}else{break;}			
+			}		
+	
+				printf("保存成功！\n");
+				printf("\n");
+					
+					
+}
+
+bool gDelete(goods *head,int num)//3.删除货物信息 (已完善)
+{
+		goods *p = head;
+		while(1)
+		{
+			printf("请输入所要删除信息货物的编号："); 
+			if (scanf("%d", &num) != 1)
+       		{
+       			printf("\n");
+            	printf("[ERROW]您的输入有误，请重新输入。\n");      
+            	while (getchar() != '\n');
+        	}else{break;}	
+		}	
+			printf("\n");
+			while(p -> next != NULL)
+			{
+			if(p -> next -> num == num )
+			{
+				goods *q = p->next;
+				p -> next = p -> next -> next;
+				free(q);
+				return true;
+			}
+			p = p -> next;
+		}
+	return false;	
+}
+
+
+
+bool gModify(goods *head, int num)//4.修改货物信息（已完善） 
+{
+	goods *p= head -> next;
+	int chance1;
+	while(1)
+		{
+			printf("请输入所要修改信息货物当前的编号："); 
+			if (scanf("%d", &num) != 1)
+       		{
+       			printf("\n");
+            	printf("[ERROW]您的输入有误，请重新输入。\n");      
+            	while (getchar() != '\n');
+        	}else{break;}	
+		}
+	while(p != NULL)
+	{	
+		if(p -> num == num)
+	{
+	printf("请输入你要修改的信息：1.编号 2.名称 3.价格 4.数量 5.类别：");
+	scanf("%d", &chance1);
+	
+	switch (chance1)
+	{
+	case 1:
+			while(1)
+			{
+				printf("请输入修改后的编号："); 
+				fflush(stdin);
+				if (scanf("%d", &p -> num) != 1)
+       			{
+       				printf("\n");
+        	    	printf("[ERROW]您的输入有误，请重新输入。\n");     
+        	    	while (getchar() != '\n');
+        		}else{break;}
+        	}
+			return true;
+	case 2:
+			while(1)
+			{
+				printf("请输入修改后的名称："); 
+				fflush(stdin);
+				if (scanf("%s", &p -> name) != 1)
+       			{
+       				printf("\n");
+        	    	printf("[ERROW]您的输入有误，请重新输入。\n");     
+        	    	while (getchar() != '\n');
+        		}else{break;}
+        	}
+			return true;
+	case 3:
+			while(1)
+			{
+				printf("请输入修改后的价格：");
+				fflush(stdin);
+				if(scanf("%d", &p -> price) != 1)
+				{
+					printf("\n");
+					printf("[ERROW]您的输入有误，请重新输入。\n");  
+					while (getchar() != '\n');
+        		}else{break;}
+			}
+			return true;
+	case 4:
+			while(1)
+			{
+				printf("请输入修改后的数量：");
+				fflush(stdin);
+				if(scanf("%d", &p -> count) != 1)
+				{
+					printf("\n");
+					printf("[ERROW]您的输入有误，请重新输入。\n");  
+					while (getchar() != '\n');
+        		}else{break;}
+			}
+			return true;
+	case 5:
+			while(1)
+			{
+				printf("请输入修改后的类别："); 
+				fflush(stdin);
+				if (scanf("%s", &p -> type) != 1)
+       			{
+       				printf("\n");
+        	    	printf("[ERROW]您的输入有误，请重新输入。\n");     
+        	    	while (getchar() != '\n');
+        		}else{break;}
+        	}
+			return true;
+	default:
+				break;  
+		}
+		}
+		p = p -> next;
+	}
+	printf("未找到相应信息。\n");
+}
+
+
+
+bool gSearch(goods *head,int num) //5.查找货物信息（已完善） 
+{
+    goods *p = head -> next;
+    while(1)
+		{
+			printf("请输入所要查找货物的编号："); 
+			if (scanf("%d", &num) != 1)
+       		{
+       			printf("\n");
+            	printf("[ERROW]您的输入有误，请重新输入。\n");      
+            	while (getchar() != '\n');
+        	}else{break;}	
+		}
+    while (p != NULL)
+    {
+        if (p -> num == num)
+        {
+        	printf("\n");
+            printf("该货物的名称为：%s，价格为：%d，数量：%d，类型为：%s\n", p -> name, p -> price, p -> count , p -> type);
+            printf("\n");
+            return true;
+        }
+        p = p->next;
+    }
+    printf("未找到相应货物信息\n");
+    return false;
+}
+
+
+
+void gSort(goods* head)//6.给货物排序 (已完善)
+{
+	int chance2;
+	while(1)
+		{
+			printf("输入1按编号号大小排序，输入2按价格高低进行排序，输入3按数量多少进行排序："); 
+			if (scanf("%d", &chance2) != 1)
+       		{
+       			printf("\n");
+            	printf("[ERROW]您的输入有误，请重新输入。\n");    
+            	while (getchar() != '\n');
+        	}else{break;}	
+		}
+	int temp , i;
+	goods *p;
+	goods* tail = NULL;
+	switch(chance2)
+	{
+	case 1:
+		if(head != NULL)
+	do
+	{
+		temp = 0;
+		p = head -> next;
+		goods* q = head;
+		while (p != NULL && p -> next != NULL)
+		{
+			if(p -> num > p -> next -> num)
+			{
+				q -> next = p -> next;
+				p -> next = p -> next -> next;
+				q -> next -> next = p;
+				temp = 1;
+			}
+			p = p -> next;
+			q = q -> next;
+		}
+		tail = p ;	
+	}	
+		while(temp);	
+		break; 
+		
+	case 2:
+		if(head == NULL)
+	do
+	{
+		temp = 0;
+		p = head -> next;
+		goods* q = head;
+		while (p != NULL && p -> next != NULL)
+		{
+			if(p -> price > p -> next -> price)
+			{
+				q -> next = p -> next;
+				p -> next = p -> next -> next;
+				q -> next -> next = p;
+				temp = 1;
+			}
+			p = p -> next;
+			q = q -> next;
+		}
+		tail = p ;	
+	}	
+		while(temp);	
+		break; 
+		
+	case 3:
+		if(head == NULL)
+	do
+	{
+		temp = 0;
+		p = head -> next;
+		goods* q = head;
+		while (p != NULL && p -> next != NULL)
+		{
+			if(p -> count > p -> next -> count)
+			{
+				q -> next = p -> next;
+				p -> next = p -> next -> next;
+				q -> next -> next = p;
+				temp = 1;
+			}
+			p = p -> next;
+			q = q -> next;
+		}
+		tail = p;	
+	}	
+		while(temp);	//交换成了就是1，不交换了就是0，即跳出循环 
+		break; 
+	}
+	 
+}
+
+
+int main() {
+    char username[20];
+    char password[20];
+    
+    
+    int num;
+	char name[30];
+	int price;
+	int count;
+	char type[30];
+	goods* head = (goods*)malloc(sizeof(goods));
+	int n ,i ,m;
+    user myacc;
+   
+    printf("---------------欢迎来到仓库货物管理系统---------------\n");
+    if (loadacc(&myacc)) {
+        printf("账号信息已同步\n");
+    } else {
+        printf("账号信息未同步\n");
+    }
+    int choice;
+    while (1) 
+	{
+		
+        printf("1. 创建账号\n2. 登录\n3. 修改密码\n4. 找回密码\n5. 退出\n");
+        printf("请选择操作：");
+        scanf("%d", &choice);
+        switch (choice) 
+		{
+            case 1:
+                createacc(&myacc);
+                saveacc(&myacc);
+                break;
+            case 2:
+                if (login(&myacc)) 
+				{
+                    printf("登录成功\n");
+                    
+                    
+                    
+			//以下进入系统 
+			
+			
+					int a;	
+					goods g;			
+                    goods* head = (goods*)malloc(sizeof(goods));//开空间 
+                    printf("\n");
+printf("---------------欢迎进入仓库货物管理系统---------------\n"); 
+	while(1)
+	{
+	printf("	  	输入1查看货物信息\n"             	   );
+	printf("	  	输入2创建货物信息\n"                 );
+	printf("	  	输入3插入货物信息\n"                 );
+	printf("   	  	输入4删除货物信息\n"                 );
+	printf("	  	输入5修改货物信息\n"                 );
+	printf("	  	输入6查找货物信息\n"                 );
+	printf("	  	输入7进行货物排序\n"                 );
+	printf("  	 	输入8退出该系统\n"                   );
+	printf("------------------------------------------------------\n");	
+	
+	 
+	while(1)
+	{
+		printf("请选择：");
+        if (scanf("%d", &m) != 1)
+        {
+        	printf("\n");
+        	printf("[ERROW]您的输入有误，请重新输入。\n");     
+            while (getchar() != '\n');
+        } else{break;}
+	}
+	switch(m)
+	    {
+		
+		case 1://遍历 
+			printf("**********操作成功，请继续**********\n");
+			printf("\n");
+			ergodic(head);
+			printf("\n");
+			saveacc(&myacc);
+			break;
+
+			break;
+		case 2://创建
+		 if(creat(head)) 
+			{
+		
+				printf("**********操作成功，请继续**********\n");
+				printf("\n");	
+			}else 
+			{
+				printf("**********操作失败，请重试**********\n");	
+			}
+			saveacc(&myacc);
+			break;
+		case 3://插入 
+			if(gAddhead(head,n)) 
+			{
+	
+				printf("**********操作成功，请继续**********\n");
+				printf("\n");
+				ergodic(head);
+				printf("\n");	
+			}else 
+			{
+				printf("**********操作失败，请重试**********\n");	
+			}
+			saveacc(&myacc);
+			break;
+		case 4://删除 
+		 	if(gDelete(head,n)) 
+			{
+			
+				printf("**********操作成功，请继续**********\n");	
+			}else
+			{
+				printf("**********操作失败，请重试**********\n");
+			}			
+			printf("\n");
+			ergodic(head);
+			printf("\n");
+			saveacc(&myacc);
+			break;
+		case 5://修改 
+			if(gModify(head ,n)) 
+			{
+				
+				printf("**********操作成功，请继续**********\n");
+				printf("\n");
+				ergodic(head);
+				printf("\n");	
+			}else 
+			{
+				
+				printf("**********操作失败，请重试**********\n");	
+			}
+			saveacc(&myacc);
+			break;
+		case 6://查看(单个货物信息)	
+			if(gSearch(head,n)) 
+				{
+				
+					printf("**********操作成功，请继续**********\n");
+					printf("\n");
+					ergodic(head);
+					printf("\n");	
+			}else 
+				{
+					printf("**********操作失败，请重试**********\n");	
+				}
+			saveacc(&myacc);
+			break;
+		case 7:
+			gSort(head);
+		
+			printf("**********操作成功，请继续**********\n");
+			printf("\n");
+			ergodic(head);
+			printf("\n");
+			saveacc(&myacc);
+			break;
+		case 8://退出 
+			
+			printf("再见:)");
+			saveacc(&myacc);
+			return 0;
+		default :
+			printf("**********操作失败，请重试**********\n");
+			printf("\n");
+			break;
+	    } 
+		
+    }     
+	
+	           
+                } else 
+				{
+                    printf("用户名或密码错误\n");
+                }
+                saveacc(&myacc);
+                break;
+            case 3:
+                changepass(&myacc);
+                saveacc(&myacc);
+                break;
+            case 4:  
+            	findpass(&myacc);
+                printf("请先登录\n");
+                saveacc(&myacc);
+                break;
+            case 5:
+            	saveacc(&myacc);
+                printf("退出程序\n");
+                return 0;
+                break;
+            default:
+                printf("无效选择\n");
+        }
+    }
+
+}
